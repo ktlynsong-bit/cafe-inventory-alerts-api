@@ -23,3 +23,11 @@ def create_item(item: Item):
 @app.get("/items")
 def list_items():
     return {"count": len(items), "items": items}
+
+@app.get("/alerts/low-stock")
+def low_stock_alerts():
+    low_items = [item for item in items if item.current_stock <= item.minimum_stock]
+    return {
+        "count": len(low_items),
+        "items": low_items
+    }
