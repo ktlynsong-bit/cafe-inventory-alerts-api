@@ -116,3 +116,26 @@ def low_stock_alerts():
         "count": len(low_items),
         "items": low_items
     }
+
+@app.put("/items/{item_name}/{variant}")
+def update_item(item_name: str, variant: str, item: Item):
+    target_key = item_key(item_name, variant)
+
+    for i, existing_item in enumerate(items):
+        if item_key(existing_item.name, existing_item.variant) == target_key:
+            items[i] = item
+            return {"message": "item updated", "item": item}
+
+    raise HTTPException(status_code=404, detail="Item+variant not found")
+
+
+@app.delete("/items/{item_name}/{variant}")
+def delete_item(item_name: str, variant: str):
+    target_key = item_key(item_name, variant)
+
+    for i, existing_item in enumerate(items):
+        if item_key(existing_item.name, existing_item.variant) == target_key:
+            deleted_item = items.pop(i)
+            return {"message": "item deleted", "item": deleted_item}
+
+    raise HTTPException(status_code=404, detail="Item+variant not found")
