@@ -1,48 +1,44 @@
-{
-  "item_name": "Cup",
-  "item_variant": "12oz",
-  "quantity_used": 40,
-  "date": "2026-05-21"
-}
-
-{
-  "item_name": "Lid",
-  "item_variant": "12oz plastic cup lid",
-  "quantity_used": 35,
-  "date": "2026-05-21"
-}
-
-{
-  "item_name": "Straw",
-  "item_variant": "standard",
-  "quantity_used": 100,
-  "date": "2026-05-21"
-}
-
-{
-  "item_name": "Sugar Packet",
-  "item_variant": "stevia",
-  "quantity_used": 50,
-  "date": "2026-05-21"
-}
-
-{
-  "item_name": "Syrup",
-  "item_variant": "vanilla",
-  "quantity_used": 10.5,
-  "date": "2026-05-21"
-}
-
-{
-  "item_name": "Coffee Beans",
-  "item_variant": "colombia",
-  "quantity_used": 2.5,
-  "date": "2026-05-21"
-}
-
-{
-  "item_name": "Milk",
-  "item_variant": "whole",
-  "quantity_used": 3.0,
-  "date": "2026-05-21"
-}
+[
+  {
+    "item_name": "Cup",
+    "item_variant": "12oz",
+    "quantity_used": 40,
+    "date": "2026-05-21"
+  },
+  {
+    "item_name": "Lid",
+    "item_variant": "12oz plastic cup lid",
+    "quantity_used": 35,
+    "date": "2026-05-21"
+  },
+  {
+    "item_name": "Straw",
+    "item_variant": "standard",
+    "quantity_used": 100,
+    "date": "2026-05-21"
+  },
+  {
+    "item_name": "Sugar Packet",
+    "item_variant": "stevia",
+    "quantity_used": 50,
+    "date": "2026-05-21"
+  },
+  {
+    "item_name": "Syrup",
+    "item_variant": "vanilla",
+    "quantity_used": 10.5,
+    "date": "2026-05-21"
+  },
+  {
+    "item_name": "Coffee Beans",
+    "item_variant": "colombia",
+    "quantity_used": 2.5,
+    "date": "2026-05-21"
+  },
+  {
+    "item_name": "Milk",
+    "item_variant": "whole",
+    "quantity_used": 3.0,
+    "date": "2026-05-21"
+  }
+]

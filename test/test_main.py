@@ -136,3 +136,46 @@ def test_burn_rate_returns_data():
     body = res.json()
     assert body["count"] >= 1
     assert "avg_daily_usage" in body["items"][0]
+
+
+def test_reorder_suggestions_returns_expected_fields():
+    reset_state()
+    client.post("/items", json={
+        "category": "cups",
+        "name": "Cup",
+        "variant": "12oz",
+        "material": "paper",
+        "size_value": 12,
+        "size_unit": "oz",
+        "measure_unit": "count",
+        "quantity_on_hand": 10,
+        "reorder_point": 20,
+        "lead_time_days": 5,
+        "expiration_date": None
+    })
+
+    client.post("/usage-logs", json={
+        "item_name": "Cup",
+        "item_variant": "12oz",
+        "quantity_used": 5,
+        "date": "2026-05-20"
+    })
+    client.post("/usage-logs", json={
+        "item_name": "Cup",
+        "item_variant": "12oz",
+        "quantity_used": 5,
+        "date": "2026-05-21"
+    })
+
+    res = client.get("/analytics/reorder-suggestions")
+    assert res.status_code == 200
+    body = res.json()
+    assert body["count"] >= 1
+
+    suggestion = body["suggestions"][0]
+    assert "item_name" in suggestion
+    assert "item_variant" in suggestion
+    assert "avg_daily_usage" in suggestion
+    assert "days_left" in suggestion
+    assert "reorder_now" in suggestion
+    assert "suggested_reorder_quantity" in suggestion

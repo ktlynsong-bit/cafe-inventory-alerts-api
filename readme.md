@@ -1,7 +1,125 @@
-//how to run main
+# Cafe Inventory Alerts API
+
+A backend API for cafe inventory operations built with FastAPI, SQLAlchemy, and SQLite.
+
+This project tracks inventory items (cups, lids, milk, beans, syrups, etc.), records daily usage, and provides analytics endpoints for low-stock detection, burn-rate tracking, and reorder suggestions.
+
+## What This API Does
+
+- Create and manage detailed inventory items with category, variant, and stock metadata
+- Bulk import inventory records for fast setup
+- Log daily item usage and automatically reduce stock on hand
+- Flag low-stock items
+- Calculate burn rate based on usage logs
+- Generate reorder suggestions using stock, burn rate, reorder points, and lead time
+
+## Tech Stack
+
+- Python
+- FastAPI
+- SQLAlchemy ORM
+- SQLite
+- Pytest
+
+## Project Structure
+
+```text
+cafe-inventory-alerts-api/
+	main.py
+	database.py
+	cafe_inventory.db
+	test/
+		test_main.py
+	example/
+		post_items_bulk.json
+		post_usage_logs.json
+```
+
+## Run Locally
+
+```bash
+cd /.../cafe-inventory-alerts-api
 source .venv/bin/activate
 fastapi dev main.py
+```
 
-//how to run test
+API docs will be available at:
+
+- http://127.0.0.1:8000/docs
+
+## Run Tests
+
+```bash
+cd /.../cafe-inventory-alerts-api
 source .venv/bin/activate
 python -m pytest -q
+```
+
+## Core Endpoints
+
+### Health
+
+- GET /health
+
+### Items
+
+- POST /items
+- POST /items/bulk
+- GET /items
+- PUT /items/{item_name}/{variant}
+- DELETE /items/{item_name}/{variant}
+
+### Usage Logs
+
+- POST /usage-logs
+- GET /usage-logs
+
+### Analytics
+
+- GET /alerts/low-stock
+- GET /analytics/burn-rate
+- GET /analytics/reorder-suggestions
+
+## Example Requests
+
+Bulk item seed:
+
+```bash
+curl -X POST http://127.0.0.1:8000/items/bulk \
+	-H "Content-Type: application/json" \
+	-d @example/post_items_bulk.json
+```
+
+One usage log:
+
+```bash
+curl -X POST http://127.0.0.1:8000/usage-logs \
+	-H "Content-Type: application/json" \
+	-d '{"item_name":"Cup","item_variant":"12oz","quantity_used":40,"date":"2026-05-21"}'
+```
+
+Burn rate:
+
+```bash
+curl http://127.0.0.1:8000/analytics/burn-rate
+```
+
+Reorder suggestions:
+
+```bash
+curl http://127.0.0.1:8000/analytics/reorder-suggestions
+```
+
+## Notes
+
+- Current persistence is SQLite for local development.
+- The database file is intentionally ignored in git.
+- For production, switch to PostgreSQL and environment-based configuration.
+
+## Roadmap
+
+- Add supplier and purchase order entities
+- Add expiration-first usage recommendations for perishable items
+- Add authentication and role-based access
+- Add pagination and filtering for large inventories
+- Add CI test workflow
