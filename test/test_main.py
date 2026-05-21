@@ -1,12 +1,18 @@
 from fastapi.testclient import TestClient
-from main import app, items, usage_logs
+from database import SessionLocal, ItemDB, UsageLogDB
+from main import app
 
 client = TestClient(app)
 
 
 def reset_state():
-    items.clear()
-    usage_logs.clear()
+    db = SessionLocal()
+    try:
+        db.query(UsageLogDB).delete()
+        db.query(ItemDB).delete()
+        db.commit()
+    finally:
+        db.close()
 
 
 def test_health():
