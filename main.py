@@ -1,20 +1,43 @@
 from fastapi import FastAPI, HTTPException
-from pydantic import BaseModel
+from typing import Literal
+from pydantic import BaseModel, Field
 from datetime import date
 
 app = FastAPI(title="Cafe Inventory Alerts API")
 
+Category = Literal[
+    "cups", "lids", "straws", "sleeves", "carriers", "napkins",
+    "sugar", "syrup", "beans", "milk"
+]
+
+MeasureUnit = Literal["count", "fl_oz", "lb", "liter", "packet"]
+
 class Item(BaseModel):
+    category: Category
     name: str
-    unit: str
-    current_stock: int
-    minimum_stock: int
+    variant: str | None = None            # e.g. "12oz", "vanilla", "oat"
+    material: str | None = None           # e.g. "paper", "plastic"
+    size_value: float | None = None       # e.g. 12
+    size_unit: str | None = None          # e.g. "oz"
+    measure_unit: MeasureUnit             # how stock is measured
+    quantity_on_hand: float = Field(ge=0)
+    reorder_point: float = Field(ge=0)
+    lead_time_days: int = Field(ge=0)
+    expiration_date: date | None = None   # mainly milk/beans/syrups
 
 items: list[Item] = []
+
+class BulkItemsRequest(BaseModel):
+    items: list[Item]
 
 @app.get("/health")
 def health_check():
     return {"status": "ok"}
+
+@app.post("/items/bulk")
+def create_items_bulk(payload: BulkItemsRequest):
+    items.extend(payload.items)
+    return {"message": "bulk items created", "count": len(payload.items)}
 
 @app.post("/items")
 def create_item(item: Item):
@@ -24,14 +47,6 @@ def create_item(item: Item):
 @app.get("/items")
 def list_items():
     return {"count": len(items), "items": items}
-
-@app.get("/alerts/low-stock")
-def low_stock_alerts():
-    low_items = [item for item in items if item.current_stock <= item.minimum_stock]
-    return {
-        "count": len(low_items),
-        "items": low_items
-    }
 
 class UsageLog(BaseModel):
     item_name: str
@@ -44,12 +59,12 @@ usage_logs: list[UsageLog] = []
 def log_usage(log: UsageLog):
     for item in items:
         if item.name == log.item_name:
-            if log.quantity_used > item.current_stock:
+            if log.quantity_used > item.quantity_on_hand:
                 raise HTTPException(
                     status_code=400,
                     detail="Not enough stock available"
                 )
-            item.current_stock -= log.quantity_used
+            item.quantity_on_hand -= log.quantity_used
             usage_logs.append(log)
             return {"message": "usage logged", "item": item}
     raise HTTPException(status_code=404, detail="Item not found")
@@ -84,3 +99,11 @@ def calculate_burn_rate():
         )
 
     return {"count": len(results), "items": results}
+
+@app.get("/alerts/low-stock")
+def low_stock_alerts():
+    low_items = [item for item in items if item.quantity_on_hand <= item.reorder_point]
+    return {
+        "count": len(low_items),
+        "items": low_items
+    }

@@ -1,0 +1,42 @@
+{
+  "items": [
+    { "category": "cups", "name": "Cup", "variant": "12oz", "material": "plastic", "size_value": 12, "size_unit": "oz", "measure_unit": "count", "quantity_on_hand": 500, "reorder_point": 150, "lead_time_days": 5, "expiration_date": null },
+    { "category": "cups", "name": "Cup", "variant": "16oz", "material": "plastic", "size_value": 16, "size_unit": "oz", "measure_unit": "count", "quantity_on_hand": 400, "reorder_point": 120, "lead_time_days": 5, "expiration_date": null },
+    { "category": "cups", "name": "Cup", "variant": "20oz", "material": "plastic", "size_value": 20, "size_unit": "oz", "measure_unit": "count", "quantity_on_hand": 300, "reorder_point": 100, "lead_time_days": 5, "expiration_date": null },
+
+    { "category": "cups", "name": "Cup", "variant": "8oz", "material": "paper", "size_value": 8, "size_unit": "oz", "measure_unit": "count", "quantity_on_hand": 450, "reorder_point": 140, "lead_time_days": 5, "expiration_date": null },
+    { "category": "cups", "name": "Cup", "variant": "12oz", "material": "paper", "size_value": 12, "size_unit": "oz", "measure_unit": "count", "quantity_on_hand": 550, "reorder_point": 160, "lead_time_days": 5, "expiration_date": null },
+    { "category": "cups", "name": "Cup", "variant": "16oz", "material": "paper", "size_value": 16, "size_unit": "oz", "measure_unit": "count", "quantity_on_hand": 420, "reorder_point": 130, "lead_time_days": 5, "expiration_date": null },
+    { "category": "cups", "name": "Cup", "variant": "20oz", "material": "paper", "size_value": 20, "size_unit": "oz", "measure_unit": "count", "quantity_on_hand": 320, "reorder_point": 100, "lead_time_days": 5, "expiration_date": null },
+
+    { "category": "lids", "name": "Lid", "variant": "12oz plastic cup lid", "material": "plastic", "size_value": 12, "size_unit": "oz", "measure_unit": "count", "quantity_on_hand": 450, "reorder_point": 140, "lead_time_days": 5, "expiration_date": null },
+    { "category": "lids", "name": "Lid", "variant": "16oz plastic cup lid", "material": "plastic", "size_value": 16, "size_unit": "oz", "measure_unit": "count", "quantity_on_hand": 380, "reorder_point": 120, "lead_time_days": 5, "expiration_date": null },
+    { "category": "lids", "name": "Lid", "variant": "20oz plastic cup lid", "material": "plastic", "size_value": 20, "size_unit": "oz", "measure_unit": "count", "quantity_on_hand": 280, "reorder_point": 90, "lead_time_days": 5, "expiration_date": null },
+    { "category": "lids", "name": "Lid", "variant": "8oz paper cup lid", "material": "paper", "size_value": 8, "size_unit": "oz", "measure_unit": "count", "quantity_on_hand": 420, "reorder_point": 130, "lead_time_days": 5, "expiration_date": null },
+    { "category": "lids", "name": "Lid", "variant": "12oz paper cup lid", "material": "paper", "size_value": 12, "size_unit": "oz", "measure_unit": "count", "quantity_on_hand": 500, "reorder_point": 150, "lead_time_days": 5, "expiration_date": null },
+    { "category": "lids", "name": "Lid", "variant": "16oz paper cup lid", "material": "paper", "size_value": 16, "size_unit": "oz", "measure_unit": "count", "quantity_on_hand": 390, "reorder_point": 120, "lead_time_days": 5, "expiration_date": null },
+    { "category": "lids", "name": "Lid", "variant": "20oz paper cup lid", "material": "paper", "size_value": 20, "size_unit": "oz", "measure_unit": "count", "quantity_on_hand": 300, "reorder_point": 95, "lead_time_days": 5, "expiration_date": null },
+
+    { "category": "straws", "name": "Straw", "variant": "standard", "material": "plastic", "size_value": null, "size_unit": null, "measure_unit": "count", "quantity_on_hand": 2000, "reorder_point": 600, "lead_time_days": 7, "expiration_date": null },
+    { "category": "sleeves", "name": "Cup Sleeve", "variant": "standard", "material": "paper", "size_value": null, "size_unit": null, "measure_unit": "count", "quantity_on_hand": 900, "reorder_point": 250, "lead_time_days": 7, "expiration_date": null },
+    { "category": "carriers", "name": "Cup Carrier", "variant": "4-cup", "material": "paper", "size_value": null, "size_unit": null, "measure_unit": "count", "quantity_on_hand": 300, "reorder_point": 80, "lead_time_days": 7, "expiration_date": null },
+    { "category": "napkins", "name": "Napkin", "variant": "standard", "material": "paper", "size_value": null, "size_unit": null, "measure_unit": "count", "quantity_on_hand": 5000, "reorder_point": 1500, "lead_time_days": 7, "expiration_date": null },
+
+    { "category": "sugar", "name": "Sugar Packet", "variant": "stevia", "material": null, "size_value": null, "size_unit": null, "measure_unit": "packet", "quantity_on_hand": 1200, "reorder_point": 300, "lead_time_days": 7, "expiration_date": null },
+    { "category": "sugar", "name": "Sugar Packet", "variant": "raw", "material": null, "size_value": null, "size_unit": null, "measure_unit": "packet", "quantity_on_hand": 1100, "reorder_point": 300, "lead_time_days": 7, "expiration_date": null },
+
+    { "category": "syrup", "name": "Syrup", "variant": "vanilla", "material": null, "size_value": 25.4, "size_unit": "fl_oz", "measure_unit": "fl_oz", "quantity_on_hand": 152.4, "reorder_point": 50.8, "lead_time_days": 6, "expiration_date": "2026-08-31" },
+    { "category": "syrup", "name": "Syrup", "variant": "hazelnut", "material": null, "size_value": 25.4, "size_unit": "fl_oz", "measure_unit": "fl_oz", "quantity_on_hand": 101.6, "reorder_point": 38.1, "lead_time_days": 6, "expiration_date": "2026-08-31" },
+    { "category": "syrup", "name": "Syrup", "variant": "lavender", "material": null, "size_value": 25.4, "size_unit": "fl_oz", "measure_unit": "fl_oz", "quantity_on_hand": 76.2, "reorder_point": 25.4, "lead_time_days": 6, "expiration_date": "2026-08-31" },
+
+    { "category": "beans", "name": "Coffee Beans", "variant": "colombia", "material": null, "size_value": null, "size_unit": null, "measure_unit": "lb", "quantity_on_hand": 25, "reorder_point": 8, "lead_time_days": 4, "expiration_date": "2026-06-30" },
+    { "category": "beans", "name": "Coffee Beans", "variant": "costa rica", "material": null, "size_value": null, "size_unit": null, "measure_unit": "lb", "quantity_on_hand": 18, "reorder_point": 6, "lead_time_days": 4, "expiration_date": "2026-06-30" },
+    { "category": "beans", "name": "Coffee Beans", "variant": "brazil", "material": null, "size_value": null, "size_unit": null, "measure_unit": "lb", "quantity_on_hand": 20, "reorder_point": 6, "lead_time_days": 4, "expiration_date": "2026-06-30" },
+
+    { "category": "milk", "name": "Milk", "variant": "whole", "material": null, "size_value": null, "size_unit": null, "measure_unit": "liter", "quantity_on_hand": 28, "reorder_point": 10, "lead_time_days": 2, "expiration_date": "2026-05-28" },
+    { "category": "milk", "name": "Milk", "variant": "skim", "material": null, "size_value": null, "size_unit": null, "measure_unit": "liter", "quantity_on_hand": 16, "reorder_point": 6, "lead_time_days": 2, "expiration_date": "2026-05-27" },
+    { "category": "milk", "name": "Milk", "variant": "almond", "material": null, "size_value": null, "size_unit": null, "measure_unit": "liter", "quantity_on_hand": 18, "reorder_point": 6, "lead_time_days": 2, "expiration_date": "2026-06-10" },
+    { "category": "milk", "name": "Milk", "variant": "oat", "material": null, "size_value": null, "size_unit": null, "measure_unit": "liter", "quantity_on_hand": 20, "reorder_point": 7, "lead_time_days": 2, "expiration_date": "2026-06-10" },
+    { "category": "milk", "name": "Milk", "variant": "cashew", "material": null, "size_value": null, "size_unit": null, "measure_unit": "liter", "quantity_on_hand": 12, "reorder_point": 4, "lead_time_days": 2, "expiration_date": "2026-06-10" }
+  ]
+}
