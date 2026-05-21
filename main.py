@@ -139,3 +139,52 @@ def delete_item(item_name: str, variant: str):
             return {"message": "item deleted", "item": deleted_item}
 
     raise HTTPException(status_code=404, detail="Item+variant not found")
+
+@app.get("/analytics/reorder-suggestions")
+def reorder_suggestions():
+    # Build avg daily usage from usage_logs
+    totals = {}
+    days = {}
+
+    for log in usage_logs:
+        key = item_key(log.item_name, log.item_variant)
+        totals[key] = totals.get(key, 0) + log.quantity_used
+        days.setdefault(key, set()).add(log.date)
+
+    avg_usage = {}
+    for key, total_used in totals.items():
+        days_tracked = max(1, len(days[key]))
+        avg_usage[key] = total_used / days_tracked
+
+    suggestions = []
+    target_days = 14  # Aim to keep ~14 days of stock
+
+    for item in items:
+        key = item_key(item.name, item.variant)
+        daily = avg_usage.get(key, 0)
+
+        if daily > 0:
+            days_left = round(item.quantity_on_hand / daily, 2)
+            suggested_qty = max(0, round((daily * target_days) - item.quantity_on_hand, 2))
+        else:
+            days_left = None
+            suggested_qty = 0
+
+        reorder_now = (
+            item.quantity_on_hand <= item.reorder_point
+            or (days_left is not None and days_left <= item.lead_time_days)
+        )
+
+        suggestions.append({
+            "item_name": item.name,
+            "item_variant": item.variant,
+            "quantity_on_hand": item.quantity_on_hand,
+            "reorder_point": item.reorder_point,
+            "avg_daily_usage": round(daily, 2) if daily > 0 else 0,
+            "days_left": days_left,
+            "lead_time_days": item.lead_time_days,
+            "reorder_now": reorder_now,
+            "suggested_reorder_quantity": suggested_qty
+        })
+
+    return {"count": len(suggestions), "suggestions": suggestions}
