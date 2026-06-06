@@ -190,6 +190,36 @@ def low_stock_alerts(db: Session = Depends(get_db)):
         "items": low_items
     }
 
+@app.get("/alerts/expiration-risk")
+def expiration_risk_alerts(days_ahead: int = 14, db: Session = Depends(get_db)):
+    today = date.today()
+    cutoff_date = date.fromordinal(today.toordinal() + days_ahead)
+    rows = (
+        db.query(ItemDB)
+        .filter(ItemDB.expiration_date.isnot(None))
+        .filter(ItemDB.expiration_date <= cutoff_date)
+        .order_by(ItemDB.expiration_date.asc())
+        .all()
+    )
+
+    risky_items = []
+    for row in rows:
+        if row.expiration_date is None:
+            continue
+
+        risky_items.append(
+            {
+                **item_row_to_dict(row),
+                "days_until_expiration": (row.expiration_date - today).days,
+            }
+        )
+
+    return {
+        "count": len(risky_items),
+        "days_ahead": days_ahead,
+        "items": risky_items,
+    }
+
 @app.put("/items/{item_name}/{variant}")
 def update_item(item_name: str, variant: str, item: Item, db: Session = Depends(get_db)):
     row = find_item_row(db, item_name, variant)

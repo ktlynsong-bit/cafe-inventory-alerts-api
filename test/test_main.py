@@ -102,6 +102,46 @@ def test_low_stock_alerts():
     assert body["items"][0]["variant"] == "16oz"
 
 
+def test_expiration_risk_alerts_returns_near_expiry_items():
+    reset_state()
+    client.post("/items", json={
+        "category": "milk",
+        "name": "Oat Milk",
+        "variant": "Barista",
+        "material": "carton",
+        "size_value": 64,
+        "size_unit": "fl_oz",
+        "measure_unit": "liter",
+        "quantity_on_hand": 8,
+        "reorder_point": 2,
+        "lead_time_days": 3,
+        "expiration_date": "2026-06-08"
+    })
+
+    client.post("/items", json={
+        "category": "beans",
+        "name": "Espresso Beans",
+        "variant": "House",
+        "material": "bag",
+        "size_value": 5,
+        "size_unit": "lb",
+        "measure_unit": "lb",
+        "quantity_on_hand": 12,
+        "reorder_point": 4,
+        "lead_time_days": 7,
+        "expiration_date": "2026-07-20"
+    })
+
+    res = client.get("/alerts/expiration-risk?days_ahead=7")
+    assert res.status_code == 200
+
+    body = res.json()
+    assert body["count"] == 1
+    assert body["days_ahead"] == 7
+    assert body["items"][0]["name"] == "Oat Milk"
+    assert body["items"][0]["days_until_expiration"] == 3
+
+
 def test_burn_rate_returns_data():
     reset_state()
     client.post("/items", json={

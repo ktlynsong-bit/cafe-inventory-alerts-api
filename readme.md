@@ -4,12 +4,15 @@ A backend API for cafe inventory operations built with FastAPI, SQLAlchemy, and 
 
 This project tracks inventory items (cups, lids, milk, beans, syrups, etc.), records daily usage, and provides analytics endpoints for low-stock detection, burn-rate tracking, and reorder suggestions.
 
+It is designed to be portfolio-ready: practical inventory workflows, analytics that resemble real cafe operations, and clear test coverage.
+
 ## What This API Does
 
 - Create and manage detailed inventory items with category, variant, and stock metadata
 - Bulk import inventory records for fast setup
 - Log daily item usage and automatically reduce stock on hand
 - Flag low-stock items
+- Flag items at expiration risk for perishable stock
 - Calculate burn rate based on usage logs
 - Generate reorder suggestions using stock, burn rate, reorder points, and lead time
 
@@ -77,6 +80,7 @@ python -m pytest -q
 ### Analytics
 
 - GET /alerts/low-stock
+- GET /alerts/expiration-risk
 - GET /analytics/burn-rate
 - GET /analytics/reorder-suggestions
 
@@ -109,6 +113,18 @@ Reorder suggestions:
 ```bash
 curl http://127.0.0.1:8000/analytics/reorder-suggestions
 ```
+
+Expiration risk alerts:
+
+```bash
+curl "http://127.0.0.1:8000/alerts/expiration-risk?days_ahead=14"
+```
+
+## Portfolio Notes
+
+If you want a short resume bullet, this project can be described as:
+
+- Built a FastAPI + SQLAlchemy inventory management API with CRUD, usage logging, low-stock alerts, burn-rate analytics, reorder suggestions, and perishable expiration-risk tracking.
 
 ## Notes
 
