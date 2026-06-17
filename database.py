@@ -36,3 +36,14 @@ class UsageLogDB(Base):
     item_variant: Mapped[str | None] = mapped_column(String, nullable=True)
     quantity_used: Mapped[float] = mapped_column(Float, nullable=False)
     date: Mapped[date] = mapped_column(Date, nullable=False)
+
+
+class SupplierDB(Base):
+    __tablename__ = "suppliers"
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
+    name: Mapped[str] = mapped_column(String, nullable=False)
+    contact_name: Mapped[str | None] = mapped_column(String, nullable=True)
+    contact_email: Mapped[str | None] = mapped_column(String, nullable=True)
+    contact_phone: Mapped[str | None] = mapped_column(String, nullable=True)
+    lead_time_days: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    notes: Mapped[str | None] = mapped_column(String, nullable=True)

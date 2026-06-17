@@ -14,7 +14,9 @@ It is designed to be portfolio-ready: practical inventory workflows, analytics t
 
 ## What This API Does
 
+- Show a simple homepage at `/` with links to docs and key endpoints
 - Create and manage detailed inventory items with category, variant, and stock metadata
+- Create and manage supplier records with contact details and lead times
 - Bulk import inventory records for fast setup
 - Log daily item usage and automatically reduce stock on hand
 - Flag low-stock items
@@ -69,7 +71,16 @@ python -m pytest -q
 
 ### Health
 
+- GET /
 - GET /health
+
+### Suppliers
+
+- POST /suppliers
+- GET /suppliers
+- GET /suppliers/{supplier_id}
+- PUT /suppliers/{supplier_id}
+- DELETE /suppliers/{supplier_id}
 
 ### Items
 
@@ -125,6 +136,14 @@ Expiration risk alerts:
 
 ```bash
 curl "http://127.0.0.1:8000/alerts/expiration-risk?days_ahead=14"
+```
+
+Supplier create:
+
+```bash
+curl -X POST http://127.0.0.1:8000/suppliers \
+	-H "Content-Type: application/json" \
+	-d '{"name":"Metro Food Supply","contact_name":"Ari Lee","lead_time_days":4}'
 ```
 
 ## Portfolio Notes

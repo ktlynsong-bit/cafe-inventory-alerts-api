@@ -3,10 +3,11 @@ from typing import Literal
 from pydantic import BaseModel, Field
 from datetime import date
 from fastapi import Depends
+from fastapi.responses import HTMLResponse
 from sqlalchemy.orm import Session
 from sqlalchemy import func, or_
 from database import SessionLocal, engine, Base
-from database import ItemDB, UsageLogDB
+from database import ItemDB, UsageLogDB, SupplierDB
 
 app = FastAPI(title="Cafe Inventory Alerts API")
 
@@ -47,6 +48,18 @@ def usage_log_row_to_dict(row: UsageLogDB) -> dict:
         "item_variant": row.item_variant,
         "quantity_used": row.quantity_used,
         "date": row.date,
+    }
+
+
+def supplier_row_to_dict(row: SupplierDB) -> dict:
+    return {
+        "id": row.id,
+        "name": row.name,
+        "contact_name": row.contact_name,
+        "contact_email": row.contact_email,
+        "contact_phone": row.contact_phone,
+        "lead_time_days": row.lead_time_days,
+        "notes": row.notes,
     }
 
 def build_usage_stats(rows: list[UsageLogDB]) -> tuple[dict[str, float], dict[str, set[date]]]:
@@ -107,9 +120,132 @@ class UsageLog(BaseModel):
 class BulkItemsRequest(BaseModel):
     items: list[Item]
 
+
+class SupplierCreate(BaseModel):
+    name: str
+    contact_name: str | None = None
+    contact_email: str | None = None
+    contact_phone: str | None = None
+    lead_time_days: int = Field(ge=0, default=0)
+    notes: str | None = None
+
+
+class SupplierUpdate(BaseModel):
+    name: str | None = None
+    contact_name: str | None = None
+    contact_email: str | None = None
+    contact_phone: str | None = None
+    lead_time_days: int | None = Field(ge=0, default=None)
+    notes: str | None = None
+
+
+@app.get("/", response_class=HTMLResponse)
+def homepage():
+    return """
+<!doctype html>
+<html lang=\"en\">
+  <head>
+    <meta charset=\"utf-8\" />
+    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\" />
+    <title>Cafe Inventory Alerts API</title>
+    <style>
+      body { font-family: -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif; margin: 2rem; color: #1a1a1a; }
+      .card { max-width: 760px; border: 1px solid #e8e8e8; border-radius: 12px; padding: 1.25rem; }
+      h1 { margin-top: 0; }
+      ul { line-height: 1.7; }
+      code { background: #f6f6f6; padding: 0.1rem 0.3rem; border-radius: 6px; }
+    </style>
+  </head>
+  <body>
+    <div class=\"card\">
+      <h1>Cafe Inventory Alerts API</h1>
+      <p>Backend API for inventory tracking, usage logging, and analytics.</p>
+      <ul>
+        <li>Health: <a href=\"/health\">/health</a></li>
+        <li>Interactive docs: <a href=\"/docs\">/docs</a></li>
+        <li>Example endpoint: <code>/alerts/low-stock</code></li>
+        <li>New endpoint group: <code>/suppliers</code></li>
+      </ul>
+    </div>
+  </body>
+</html>
+"""
+
 @app.get("/health")
 def health_check():
     return {"status": "ok"}
+
+
+@app.post("/suppliers")
+def create_supplier(payload: SupplierCreate, db: Session = Depends(get_db)):
+    normalized_name = normalize_key_part(payload.name)
+    existing = (
+        db.query(SupplierDB)
+        .filter(func.lower(func.trim(SupplierDB.name)) == normalized_name)
+        .first()
+    )
+    if existing:
+        raise HTTPException(status_code=409, detail="Supplier already exists")
+
+    row = SupplierDB(**payload.model_dump())
+    db.add(row)
+    db.commit()
+    db.refresh(row)
+    return {"message": "supplier created", "supplier": supplier_row_to_dict(row)}
+
+
+@app.get("/suppliers")
+def list_suppliers(db: Session = Depends(get_db)):
+    rows = db.query(SupplierDB).order_by(func.lower(SupplierDB.name).asc()).all()
+    suppliers = [supplier_row_to_dict(row) for row in rows]
+    return {"count": len(suppliers), "suppliers": suppliers}
+
+
+@app.get("/suppliers/{supplier_id}")
+def get_supplier(supplier_id: int, db: Session = Depends(get_db)):
+    row = db.query(SupplierDB).filter(SupplierDB.id == supplier_id).first()
+    if not row:
+        raise HTTPException(status_code=404, detail="Supplier not found")
+    return {"supplier": supplier_row_to_dict(row)}
+
+
+@app.put("/suppliers/{supplier_id}")
+def update_supplier(supplier_id: int, payload: SupplierUpdate, db: Session = Depends(get_db)):
+    row = db.query(SupplierDB).filter(SupplierDB.id == supplier_id).first()
+    if not row:
+        raise HTTPException(status_code=404, detail="Supplier not found")
+
+    updates = payload.model_dump(exclude_unset=True)
+
+    if "name" in updates:
+        normalized_name = normalize_key_part(updates["name"])
+        existing = (
+            db.query(SupplierDB)
+            .filter(func.lower(func.trim(SupplierDB.name)) == normalized_name)
+            .filter(SupplierDB.id != supplier_id)
+            .first()
+        )
+        if existing:
+            raise HTTPException(status_code=409, detail="Supplier already exists")
+
+    for field_name, value in updates.items():
+        setattr(row, field_name, value)
+
+    db.commit()
+    db.refresh(row)
+    return {"message": "supplier updated", "supplier": supplier_row_to_dict(row)}
+
+
+@app.delete("/suppliers/{supplier_id}")
+def delete_supplier(supplier_id: int, db: Session = Depends(get_db)):
+    row = db.query(SupplierDB).filter(SupplierDB.id == supplier_id).first()
+    if not row:
+        raise HTTPException(status_code=404, detail="Supplier not found")
+
+    deleted = supplier_row_to_dict(row)
+    db.delete(row)
+    db.commit()
+    return {"message": "supplier deleted", "supplier": deleted}
 
 @app.post("/items/bulk")
 def create_items_bulk(payload: BulkItemsRequest, db: Session = Depends(get_db)):

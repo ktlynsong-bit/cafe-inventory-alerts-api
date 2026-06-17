@@ -1,5 +1,6 @@
 from fastapi.testclient import TestClient
-from database import SessionLocal, ItemDB, UsageLogDB
+from datetime import date, timedelta
+from database import SessionLocal, ItemDB, UsageLogDB, SupplierDB
 from main import app
 
 client = TestClient(app)
@@ -10,6 +11,7 @@ def reset_state():
     try:
         db.query(UsageLogDB).delete()
         db.query(ItemDB).delete()
+        db.query(SupplierDB).delete()
         db.commit()
     finally:
         db.close()
@@ -20,6 +22,54 @@ def test_health():
     res = client.get("/health")
     assert res.status_code == 200
     assert res.json() == {"status": "ok"}
+
+
+def test_homepage_returns_html():
+    reset_state()
+    res = client.get("/")
+    assert res.status_code == 200
+    assert "text/html" in res.headers["content-type"]
+    assert "Cafe Inventory Alerts API" in res.text
+
+
+def test_supplier_crud_flow():
+    reset_state()
+
+    create_res = client.post("/suppliers", json={
+        "name": "Metro Food Supply",
+        "contact_name": "Ari Lee",
+        "contact_email": "ari@metro.example",
+        "contact_phone": "555-0102",
+        "lead_time_days": 4,
+        "notes": "Morning delivery preferred"
+    })
+    assert create_res.status_code == 200
+    created = create_res.json()["supplier"]
+    supplier_id = created["id"]
+    assert created["name"] == "Metro Food Supply"
+
+    list_res = client.get("/suppliers")
+    assert list_res.status_code == 200
+    assert list_res.json()["count"] == 1
+
+    get_res = client.get(f"/suppliers/{supplier_id}")
+    assert get_res.status_code == 200
+    assert get_res.json()["supplier"]["contact_name"] == "Ari Lee"
+
+    update_res = client.put(f"/suppliers/{supplier_id}", json={
+        "lead_time_days": 6,
+        "notes": "Deliver by 8am"
+    })
+    assert update_res.status_code == 200
+    updated = update_res.json()["supplier"]
+    assert updated["lead_time_days"] == 6
+    assert updated["notes"] == "Deliver by 8am"
+
+    delete_res = client.delete(f"/suppliers/{supplier_id}")
+    assert delete_res.status_code == 200
+
+    missing_res = client.get(f"/suppliers/{supplier_id}")
+    assert missing_res.status_code == 404
 
 
 def test_create_and_list_items():
@@ -104,6 +154,9 @@ def test_low_stock_alerts():
 
 def test_expiration_risk_alerts_returns_near_expiry_items():
     reset_state()
+    near_expiry = (date.today() + timedelta(days=3)).isoformat()
+    safe_expiry = (date.today() + timedelta(days=30)).isoformat()
+
     client.post("/items", json={
         "category": "milk",
         "name": "Oat Milk",
@@ -115,7 +168,7 @@ def test_expiration_risk_alerts_returns_near_expiry_items():
         "quantity_on_hand": 8,
         "reorder_point": 2,
         "lead_time_days": 3,
-        "expiration_date": "2026-06-08"
+        "expiration_date": near_expiry
     })
 
     client.post("/items", json={
@@ -129,7 +182,7 @@ def test_expiration_risk_alerts_returns_near_expiry_items():
         "quantity_on_hand": 12,
         "reorder_point": 4,
         "lead_time_days": 7,
-        "expiration_date": "2026-07-20"
+        "expiration_date": safe_expiry
     })
 
     res = client.get("/alerts/expiration-risk?days_ahead=7")
