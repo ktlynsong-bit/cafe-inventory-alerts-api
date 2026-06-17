@@ -6,6 +6,12 @@ This project tracks inventory items (cups, lids, milk, beans, syrups, etc.), rec
 
 It is designed to be portfolio-ready: practical inventory workflows, analytics that resemble real cafe operations, and clear test coverage.
 
+## Live API
+
+- Base URL: https://cafe-inventory-alerts-api-production.up.railway.app/
+- Health check: https://cafe-inventory-alerts-api-production.up.railway.app/health
+- Interactive docs: https://cafe-inventory-alerts-api-production.up.railway.app/docs
+
 ## What This API Does
 
 - Create and manage detailed inventory items with category, variant, and stock metadata
@@ -48,7 +54,8 @@ fastapi dev main.py
 
 API docs will be available at:
 
-- http://127.0.0.1:8000/docs
+- Local: http://127.0.0.1:8000/docs
+- Production: https://cafe-inventory-alerts-api-production.up.railway.app/docs
 
 ## Run Tests
 
