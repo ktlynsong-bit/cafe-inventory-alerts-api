@@ -50,7 +50,6 @@ def usage_log_row_to_dict(row: UsageLogDB) -> dict:
         "date": row.date,
     }
 
-
 def supplier_row_to_dict(row: SupplierDB) -> dict:
     return {
         "id": row.id,
@@ -425,3 +424,59 @@ def reorder_suggestions(db: Session = Depends(get_db)):
             }
         )
     return {"count": len(suggestions), "suggestions": suggestions}
+
+
+@app.get("/analytics/stockout-forecast")
+def stockout_forecast(horizon_days: int = 30, db: Session = Depends(get_db)):
+    if horizon_days < 1:
+        raise HTTPException(status_code=400, detail="horizon_days must be >= 1")
+
+    usage_rows = db.query(UsageLogDB).all()
+    item_rows = db.query(ItemDB).all()
+
+    totals, days = build_usage_stats(usage_rows)
+
+    avg_usage: dict[str, float] = {}
+    for key, total_used in totals.items():
+        days_tracked = max(1, len(days[key]))
+        avg_usage[key] = total_used / days_tracked
+
+    forecasts = []
+    for row in item_rows:
+        key = item_key(row.name, row.variant)
+        daily = avg_usage.get(key, 0)
+
+        if daily > 0:
+            days_until_stockout = round(row.quantity_on_hand / daily, 2)
+            projected_quantity = round(row.quantity_on_hand - (daily * horizon_days), 2)
+            will_stockout = days_until_stockout <= horizon_days
+            projected_shortage = round(abs(projected_quantity), 2) if projected_quantity < 0 else 0
+        else:
+            days_until_stockout = None
+            projected_quantity = row.quantity_on_hand
+            will_stockout = False
+            projected_shortage = 0
+
+        forecasts.append(
+            {
+                "item_name": row.name,
+                "item_variant": row.variant,
+                "quantity_on_hand": row.quantity_on_hand,
+                "avg_daily_usage": round(daily, 2) if daily > 0 else 0,
+                "horizon_days": horizon_days,
+                "days_until_stockout": days_until_stockout,
+                "will_stockout_within_horizon": will_stockout,
+                "projected_quantity_at_horizon": projected_quantity,
+                "projected_shortage_at_horizon": projected_shortage,
+            }
+        )
+
+    forecasts.sort(
+        key=lambda x: (
+            not x["will_stockout_within_horizon"],
+            x["days_until_stockout"] is None,
+            x["days_until_stockout"] if x["days_until_stockout"] is not None else 10**9,
+        )
+    )
+
+    return {"count": len(forecasts), "horizon_days": horizon_days, "items": forecasts}

@@ -272,3 +272,40 @@ def test_reorder_suggestions_returns_expected_fields():
     assert "days_left" in suggestion
     assert "reorder_now" in suggestion
     assert "suggested_reorder_quantity" in suggestion
+
+
+def test_stockout_forecast_flags_item_at_risk():
+    reset_state()
+    client.post("/items", json={
+        "category": "cups",
+        "name": "Cup",
+        "variant": "8oz",
+        "material": "paper",
+        "size_value": 8,
+        "size_unit": "oz",
+        "measure_unit": "count",
+        "quantity_on_hand": 10,
+        "reorder_point": 3,
+        "lead_time_days": 2,
+        "expiration_date": None
+    })
+
+    client.post("/usage-logs", json={
+        "item_name": "Cup",
+        "item_variant": "8oz",
+        "quantity_used": 5,
+        "date": "2026-05-20"
+    })
+
+    res = client.get("/analytics/stockout-forecast?horizon_days=7")
+    assert res.status_code == 200
+
+    body = res.json()
+    assert body["count"] >= 1
+    assert body["horizon_days"] == 7
+
+    forecast = body["items"][0]
+    assert forecast["item_name"] == "Cup"
+    assert forecast["item_variant"] == "8oz"
+    assert forecast["will_stockout_within_horizon"] is True
+    assert forecast["days_until_stockout"] == 1.0

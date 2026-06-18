@@ -23,6 +23,7 @@ It is designed to be portfolio-ready: practical inventory workflows, analytics t
 - Flag items at expiration risk for perishable stock
 - Calculate burn rate based on usage logs
 - Generate reorder suggestions using stock, burn rate, reorder points, and lead time
+- Forecast likely stockouts within a configurable time horizon
 
 ## Tech Stack
 
@@ -101,6 +102,7 @@ python -m pytest -q
 - GET /alerts/expiration-risk
 - GET /analytics/burn-rate
 - GET /analytics/reorder-suggestions
+- GET /analytics/stockout-forecast
 
 ## Example Requests
 
@@ -130,6 +132,12 @@ Reorder suggestions:
 
 ```bash
 curl http://127.0.0.1:8000/analytics/reorder-suggestions
+```
+
+Stockout forecast:
+
+```bash
+curl "http://127.0.0.1:8000/analytics/stockout-forecast?horizon_days=30"
 ```
 
 Expiration risk alerts:
